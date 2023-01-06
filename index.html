@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <form id="form">
+      <div>
+        <label for="velikost_plochy">Velikost hrací plochy:</label>
+        <input type="number" id="velikost_plochy" name="velikost_plochy" />
+      </div>
+      <div>
+        <label for="hrac1">Jméno hráče 1: </label>
+        <input type="string" id="hrac1" name="hrac1" />
+
+        <label for="znak1">Znak</label>
+        <select id="znak1" name="znak1">
+          <option>X</option>
+          <option>O</option>
+        </select>
+      </div>
+      <div>
+        <label for="hrac2">Jméno hráče 2: </label>
+        <input type="string" id="hrac2" name="hrac2" />
+
+        <label for="znak2">Znak</label>
+        <select id="znak2" name="znak2">
+          <option>X</option>
+          <option>O</option>
+        </select>
+      </div>
+      <button>Odeslat!</button>
+    </form>
+    <div id="gameBoard"></div>
+
+    <!--    <script type="module" src="main.js"></script>-->
+    <script type="module" src="canvas.js"></script>
+
+    <canvas
+      width="0px"
+      height="0px"
+      style="border: 1px solid #000000; margin-top: 50px"
+      id="canvas"
+    ></canvas>
+  </body>
+</html>
