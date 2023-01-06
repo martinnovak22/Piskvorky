@@ -8,22 +8,22 @@ const playGame = (e) => {
   e.preventDefault();
   const formData = new FormData(form);
 
-  const znak1 = formData.get("znak1");
-  const znak2 = formData.get("znak2");
+  const char1 = formData.get("char1");
+  const char2 = formData.get("char2");
 
-  game.size = formData.get("velikost_plochy");
+  game.size = formData.get("gameBoard_size");
   game.players = {
-    [znak1]: formData.get("hrac1"),
-    [znak2]: formData.get("hrac2"),
+    [char1]: formData.get("player1"),
+    [char2]: formData.get("player2"),
   };
 
-  game.currentPlayer = znak1;
+  game.currentPlayer = char1;
 
-  boardBehaviour(game, znak1, znak2);
+  boardBehaviour(game, char1, char2);
 };
 
 // reprints board every time its needed
-const boardBehaviour = (game, znak1, znak2) => {
+const boardBehaviour = (game, char1, char2) => {
   // if board already exists => removes it
   if (gameBoard.hasChildNodes()) {
     const board = document.getElementById("board");
@@ -42,11 +42,11 @@ const boardBehaviour = (game, znak1, znak2) => {
     for (let y = 1; y <= game.size; y++) {
       const unit = document.createElement("td");
       unit.className = "unit";
-      unit.addEventListener("click", unitBehaviour(x, y, znak1, znak2, unit));
+      unit.addEventListener("click", unitBehaviour(x, y, char1, char2, unit));
       game.map.forEach((changeUnit) => {
         // checks map array for already filled points
         if (changeUnit.x === x && changeUnit.y === y) {
-          unit.innerHTML = changeUnit.znak;
+          unit.innerHTML = changeUnit.char;
         }
       });
       row.append(unit);
@@ -55,14 +55,14 @@ const boardBehaviour = (game, znak1, znak2) => {
 };
 
 // this is click behaviour of every unit
-const unitBehaviour = (x, y, znak1, znak2, unit) => {
+const unitBehaviour = (x, y, char1, char2, unit) => {
   return () => {
     if (unit.innerHTML !== "") {
       return;
     }
-    game.currentPlayer = game.currentPlayer === znak1 ? znak2 : znak1;
-    game.map.push({ x: x, y: y, znak: game.currentPlayer });
-    boardBehaviour(game, znak1, znak2);
+    game.currentPlayer = game.currentPlayer === char1 ? char2 : char1;
+    game.map.push({ x: x, y: y, char: game.currentPlayer });
+    boardBehaviour(game, char1, char2);
 
     console.log("Souřadnice [ x: " + x + " || y: " + y + " ] ");
     console.log(game.map);

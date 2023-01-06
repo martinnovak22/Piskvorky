@@ -10,36 +10,37 @@ const playGame = (e) => {
   e.preventDefault();
   const formData = new FormData(form);
 
-  const znak558987 = formData.get("znak1");
-  const znak2 = formData.get("znak2");
+  const char1 = formData.get("char1");
+  const char2 = formData.get("char2");
 
-  game.size = formData.get("velikost_plochy");
+  game.size = formData.get("gameBoard_size");
   game.players = {
-    [znak1]: formData.get("hrac1"),
-    [znak2]: formData.get("hrac2"),
+    [char1]: formData.get("player1"),
+    [char2]: formData.get("player2"),
   };
 
-  game.currentPlayer = znak1;
-  canvasBehaviour(game, znak1, znak2);
+  game.currentPlayer = char1;
+  canvasBehaviour(game, char1, char2);
 };
 
 // creates canvas
-const canvasBehaviour = (game, znak1, znak2) => {
+const canvasBehaviour = (game, char1, char2) => {
   const canvasSize = game.size * 100;
   const unitSize = canvasSize / game.size;
   canvas.width = canvasSize;
   canvas.height = canvasSize;
 
   canvas.addEventListener("mousedown", function (e) {
-    cursorBehaviour(canvas, e, znak1, znak2);
+    cursorBehaviour(canvas, e, char1, char2);
   });
-
+  // recreates units + chars inside them every time you click
   for (let x = 0; x <= canvasSize; x += unitSize) {
     for (let y = 0; y <= canvasSize; y += unitSize) {
       ctx.strokeRect(x, y, x + unitSize, y + unitSize);
       game.map.forEach((value) => {
+        // goes through game map, if it finds char at unit, draws it
         if (value.x === x + 50 && value.y === y + 50) {
-          if (value.znak === "X") {
+          if (value.char === "X") {
             drawX(value.x, value.y);
             return;
           }
@@ -51,7 +52,7 @@ const canvasBehaviour = (game, znak1, znak2) => {
 };
 
 // cursor behaviour on canvas
-const cursorBehaviour = (canvas, event, znak1, znak2) => {
+const cursorBehaviour = (canvas, event, char1, char2) => {
   const rect = canvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
@@ -64,62 +65,65 @@ const cursorBehaviour = (canvas, event, znak1, znak2) => {
       return value;
     }
   });
-
+  // if position is already filled return
   if (filled) {
     return;
   }
 
-  game.currentPlayer = game.currentPlayer === znak1 ? znak2 : znak1;
+  // push char inside game map
+  game.currentPlayer = game.currentPlayer === char1 ? char2 : char1;
   game.map.push({
     x: positionX,
     y: positionY,
-    znak: game.currentPlayer,
+    char: game.currentPlayer,
   });
 
-  canvasBehaviour(game, znak1, znak2);
+  // recreates canvas
+  canvasBehaviour(game, char1, char2);
 
+  // checks game
   checkGame(game.map[game.map.length - 1]);
 };
 
 // game state checker
 const checkGame = (clickedValue) => {
   console.log(game.map);
-  const firstZnak = game.map[0].znak;
-  if (clickedValue.znak === "X") {
-    const loopUnit = firstZnak === "X" ? 0 : 1;
+  const firstChar = game.map[0].char;
+  if (clickedValue.char === "X") {
+    const loopUnit = firstChar === "X" ? 0 : 1;
     rowChecker(clickedValue, loopUnit, "X");
     colChecker(clickedValue, loopUnit, "X");
     diagChecker(clickedValue, loopUnit, "X");
     return;
   }
-  const loopUnit = firstZnak === "O" ? 0 : 1;
+  const loopUnit = firstChar === "O" ? 0 : 1;
   rowChecker(clickedValue, loopUnit, "O");
   colChecker(clickedValue, loopUnit, "O");
   diagChecker(clickedValue, loopUnit, "O");
 };
 
-const rowChecker = (clickedValue, loopUnit, znak) => {
+// checks rows
+const rowChecker = (clickedValue, loopUnit, char) => {
+  // first unit check loop
   for (let i = loopUnit; i < game.map.length; i += 2) {
     let x = game.map[i].x;
     let y = game.map[i].y;
 
     // must be in same row (y)
     if (y === clickedValue.y && x !== clickedValue.x) {
-      // there is something on right
       if (x === clickedValue.x + 100) {
         // second unit check loop
         for (let j = loopUnit; j < game.map.length; j += 2) {
           x = game.map[j].x;
           y = game.map[j].y;
-          // again in same row
           if (y === clickedValue.y && x !== clickedValue.x) {
             if (x === clickedValue.x - 100) {
-              console.log("win " + znak);
+              console.log("win " + char);
               drawWin(clickedValue.x + 150, y, clickedValue.x - 150, y);
               return;
             }
             if (x === clickedValue.x + 200) {
-              console.log("win " + znak);
+              console.log("win " + char);
               drawWin(clickedValue.x - 50, y, clickedValue.x + 250, y);
               return;
             }
@@ -133,12 +137,12 @@ const rowChecker = (clickedValue, loopUnit, znak) => {
           y = game.map[k].y;
           if (y === clickedValue.y && x !== clickedValue.x) {
             if (x === clickedValue.x + 100) {
-              console.log("win " + znak);
+              console.log("win " + char);
               drawWin(clickedValue.x - 150, y, clickedValue.x + 150, y);
               return;
             }
             if (x === clickedValue.x - 200) {
-              console.log("win " + znak);
+              console.log("win " + char);
               drawWin(clickedValue.x + 50, y, clickedValue.x - 250, y);
               return;
             }
@@ -149,7 +153,7 @@ const rowChecker = (clickedValue, loopUnit, znak) => {
   }
 };
 
-const colChecker = (clickedValue, loopUnit, znak) => {
+const colChecker = (clickedValue, loopUnit, char) => {
   for (let i = loopUnit; i < game.map.length; i += 2) {
     let x = game.map[i].x;
     let y = game.map[i].y;
@@ -164,12 +168,12 @@ const colChecker = (clickedValue, loopUnit, znak) => {
           y = game.map[j].y;
           if (x === clickedValue.x && y !== clickedValue.y) {
             if (y === clickedValue.y - 100) {
-              console.log("win " + znak);
+              console.log("win " + char);
               drawWin(x, clickedValue.y + 150, x, clickedValue.y - 150);
               return;
             }
             if (y === clickedValue.y + 200) {
-              console.log("win " + znak);
+              console.log("win " + char);
               drawWin(x, clickedValue.y - 50, x, clickedValue.y + 250);
               return;
             }
@@ -183,12 +187,12 @@ const colChecker = (clickedValue, loopUnit, znak) => {
           y = game.map[k].y;
           if (x === clickedValue.x && y !== clickedValue.y) {
             if (x === clickedValue.x + 100) {
-              console.log("win " + znak);
+              console.log("win " + char);
               drawWin(x, clickedValue.y - 150, x, clickedValue.y + 150);
               return;
             }
             if (y === clickedValue.y - 200) {
-              console.log("win " + znak);
+              console.log("win " + char);
               drawWin(x, clickedValue.y + 50, x, clickedValue.y - 250);
               return;
             }
@@ -199,7 +203,7 @@ const colChecker = (clickedValue, loopUnit, znak) => {
   }
 };
 
-const diagChecker = (clickedValue, loopUnit, znak) => {
+const diagChecker = (clickedValue, loopUnit, char) => {
   for (let i = loopUnit; i < game.map.length; i += 2) {
     let x = game.map[i].x;
     let y = game.map[i].y;
@@ -211,7 +215,7 @@ const diagChecker = (clickedValue, loopUnit, znak) => {
         y = game.map[j].y;
 
         if (y === clickedValue.y - 100 && x === clickedValue.x - 100) {
-          console.log("win " + znak);
+          console.log("win " + char);
           drawWin(
             clickedValue.x - 150,
             clickedValue.y - 150,
@@ -222,7 +226,7 @@ const diagChecker = (clickedValue, loopUnit, znak) => {
         }
 
         if (y === clickedValue.y + 200 && x === clickedValue.x + 200) {
-          console.log("win " + znak);
+          console.log("win " + char);
           drawWin(
             clickedValue.x - 50,
             clickedValue.y - 50,
@@ -240,7 +244,7 @@ const diagChecker = (clickedValue, loopUnit, znak) => {
         y = game.map[k].y;
 
         if (y === clickedValue.y + 100 && x === clickedValue.x + 100) {
-          console.log("win " + znak);
+          console.log("win " + char);
           drawWin(
             clickedValue.x + 150,
             clickedValue.y + 150,
@@ -251,7 +255,7 @@ const diagChecker = (clickedValue, loopUnit, znak) => {
         }
 
         if (y === clickedValue.y - 200 && x === clickedValue.x - 200) {
-          console.log("win " + znak);
+          console.log("win " + char);
           drawWin(
             clickedValue.x + 50,
             clickedValue.y + 50,
@@ -269,7 +273,7 @@ const diagChecker = (clickedValue, loopUnit, znak) => {
         y = game.map[k].y;
 
         if (y === clickedValue.y + 100 && x === clickedValue.x - 100) {
-          console.log("win " + znak);
+          console.log("win " + char);
           drawWin(
             clickedValue.x + 150,
             clickedValue.y - 150,
@@ -280,7 +284,7 @@ const diagChecker = (clickedValue, loopUnit, znak) => {
         }
 
         if (y === clickedValue.y - 200 && x === clickedValue.x + 200) {
-          console.log("win " + znak);
+          console.log("win " + char);
           drawWin(
             clickedValue.x - 50,
             clickedValue.y + 50,
@@ -298,7 +302,7 @@ const diagChecker = (clickedValue, loopUnit, znak) => {
         y = game.map[k].y;
 
         if (y === clickedValue.y - 100 && x === clickedValue.x + 100) {
-          console.log("win " + znak);
+          console.log("win " + char);
           drawWin(
             clickedValue.x - 150,
             clickedValue.y + 150,
@@ -309,7 +313,7 @@ const diagChecker = (clickedValue, loopUnit, znak) => {
         }
 
         if (y === clickedValue.y + 200 && x === clickedValue.x - 200) {
-          console.log("win " + znak);
+          console.log("win " + char);
           drawWin(
             clickedValue.x + 50,
             clickedValue.y - 50,
@@ -349,8 +353,6 @@ const drawWin = (startX, startY, endX, endY) => {
   ctx.lineTo(endX, endY);
 
   ctx.stroke();
-
-  console.log("done");
 };
 
 form.addEventListener("submit", playGame);
