@@ -2,6 +2,7 @@ import game from "/game.js";
 
 const form = document.getElementById("form");
 const canvas = document.querySelector("#canvas");
+const winnerPar = document.querySelector("#winner");
 
 const ctx = canvas.getContext("2d");
 
@@ -19,7 +20,7 @@ const playGame = (e) => {
     [char2]: formData.get("player2"),
   };
 
-  game.currentPlayer = char1;
+  game.currentPlayer = char2;
   canvasBehaviour(game, char1, char2);
 };
 
@@ -30,7 +31,10 @@ const canvasBehaviour = (game, char1, char2) => {
   canvas.width = canvasSize;
   canvas.height = canvasSize;
 
-  canvas.addEventListener("mousedown", function (e) {
+  if (canvas.classList.contains("disabled")) {
+    return;
+  }
+  canvas.addEventListener("mousedown", (e) => {
     cursorBehaviour(canvas, e, char1, char2);
   });
   // recreates units + chars inside them every time you click
@@ -72,6 +76,7 @@ const cursorBehaviour = (canvas, event, char1, char2) => {
 
   // push char inside game map
   game.currentPlayer = game.currentPlayer === char1 ? char2 : char1;
+  console.log(game.currentPlayer);
   game.map.push({
     x: positionX,
     y: positionY,
@@ -80,7 +85,6 @@ const cursorBehaviour = (canvas, event, char1, char2) => {
 
   // recreates canvas
   canvasBehaviour(game, char1, char2);
-
   // checks game
   checkGame(game.map[game.map.length - 1]);
 };
@@ -347,6 +351,12 @@ const drawWin = (startX, startY, endX, endY) => {
   ctx.lineTo(endX, endY);
 
   ctx.stroke();
+
+  canvas.removeEventListener("mousedown", cursorBehaviour);
+  canvas.classList.add("disabled");
+
+  winnerPar.innerHTML =
+    "Player: " + game.players[game.currentPlayer] + " has won!";
 };
 
 form.addEventListener("submit", playGame);

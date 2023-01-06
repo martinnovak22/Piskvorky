@@ -4,3 +4,8 @@
     border: 1px solid black;
     text-align: center;
 }
+
+.disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+}
