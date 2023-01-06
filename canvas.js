@@ -89,6 +89,7 @@ const cursorBehaviour = (canvas, event, char1, char2) => {
 const checkGame = (clickedValue) => {
   console.log(game.map);
   const firstChar = game.map[0].char;
+  // gives certain loop value, depends on first char in game map (players take turns first/second/first)
   if (clickedValue.char === "X") {
     const loopUnit = firstChar === "X" ? 0 : 1;
     rowChecker(clickedValue, loopUnit, "X");
@@ -111,17 +112,20 @@ const rowChecker = (clickedValue, loopUnit, char) => {
 
     // must be in same row (y)
     if (y === clickedValue.y && x !== clickedValue.x) {
+      // [X][]
       if (x === clickedValue.x + 100) {
         // second unit check loop
         for (let j = loopUnit; j < game.map.length; j += 2) {
           x = game.map[j].x;
           y = game.map[j].y;
           if (y === clickedValue.y && x !== clickedValue.x) {
+            // [][X][]
             if (x === clickedValue.x - 100) {
               console.log("win " + char);
               drawWin(clickedValue.x + 150, y, clickedValue.x - 150, y);
               return;
             }
+            // [X][][]
             if (x === clickedValue.x + 200) {
               console.log("win " + char);
               drawWin(clickedValue.x - 50, y, clickedValue.x + 250, y);
@@ -130,17 +134,14 @@ const rowChecker = (clickedValue, loopUnit, char) => {
           }
         }
       }
-
+      // [][X]
       if (x === clickedValue.x - 100) {
+        // second unit loop
         for (let k = loopUnit; k < game.map.length; k += 2) {
           x = game.map[k].x;
           y = game.map[k].y;
           if (y === clickedValue.y && x !== clickedValue.x) {
-            if (x === clickedValue.x + 100) {
-              console.log("win " + char);
-              drawWin(clickedValue.x - 150, y, clickedValue.x + 150, y);
-              return;
-            }
+            // [][][X]
             if (x === clickedValue.x - 200) {
               console.log("win " + char);
               drawWin(clickedValue.x + 50, y, clickedValue.x - 250, y);
@@ -153,16 +154,14 @@ const rowChecker = (clickedValue, loopUnit, char) => {
   }
 };
 
+// check columns
 const colChecker = (clickedValue, loopUnit, char) => {
   for (let i = loopUnit; i < game.map.length; i += 2) {
     let x = game.map[i].x;
     let y = game.map[i].y;
 
-    // must be in same row (y)
     if (x === clickedValue.x && y !== clickedValue.y) {
-      // there is something on right
       if (y === clickedValue.y + 100) {
-        // second unit check loop
         for (let j = loopUnit; j < game.map.length; j += 2) {
           x = game.map[j].x;
           y = game.map[j].y;
@@ -186,11 +185,6 @@ const colChecker = (clickedValue, loopUnit, char) => {
           x = game.map[k].x;
           y = game.map[k].y;
           if (x === clickedValue.x && y !== clickedValue.y) {
-            if (x === clickedValue.x + 100) {
-              console.log("win " + char);
-              drawWin(x, clickedValue.y - 150, x, clickedValue.y + 150);
-              return;
-            }
             if (y === clickedValue.y - 200) {
               console.log("win " + char);
               drawWin(x, clickedValue.y + 50, x, clickedValue.y - 250);
@@ -209,7 +203,6 @@ const diagChecker = (clickedValue, loopUnit, char) => {
     let y = game.map[i].y;
 
     if (y === clickedValue.y + 100 && x === clickedValue.x + 100) {
-      // second unit check loop
       for (let j = loopUnit; j < game.map.length; j += 2) {
         x = game.map[j].x;
         y = game.map[j].y;
@@ -346,6 +339,7 @@ const drawO = (x, y) => {
   ctx.stroke();
 };
 
+// draw winning line
 const drawWin = (startX, startY, endX, endY) => {
   ctx.beginPath();
 
